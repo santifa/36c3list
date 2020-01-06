@@ -31,15 +31,19 @@ function addCollapse() {
     }
 }
 
-function renderWatched () {
-    var watched = getWatched();
+function renderWatched (watched) {
+    console.log(watched);
     var coll = document.getElementsByTagName('input');
-    console.log(coll);
     for (var i = 0; i < coll.length; i++) {
+        coll[i].checked = false;
+    }
+
+    for (i = 0; i < coll.length; i++) {
         var url = coll[i].parentNode.previousElementSibling.previousElementSibling.href;
         for (var j = 0; j < watched.length; j++) {
             if (watched[j] == url) {
-                console.log("check");
+                console.log(coll[i]);
+                console.log(url);
                 coll[i].checked = true;
             }
         }
@@ -69,6 +73,10 @@ function getWatched () {
     return yours;
 }
 
+function setWatched (watched) {
+    localStorage.setItem('watchedTalks', JSON.stringify(watched));
+    renderWatched(watched);
+}
 
 function fetchTalks () {
     var xmlhttp = new XMLHttpRequest();
@@ -88,8 +96,9 @@ function displayTalks (json) {
     var talks = JSON.parse(json);
     var talkList = document.getElementById('talks');
     renderTalks(talks, talkList, true);
+    addCollapse();
+    renderWatched(getWatched());
 }
-
 
 function renderTalks (talks, node, state) {
     if (!state) {
@@ -112,14 +121,12 @@ function renderTalks (talks, node, state) {
             '<a href="' + url +'" target="_blank">Watch</a> ' +
             btn +
             ' <label class="form-checkbox">' +
-            '<input type="checkbox">' +
-            '<i class="form-icon" onclick=watchedTalk(this)></i>Watched' +
+            '<input type="checkbox" onclick=watchedTalk(this)>' +
+            '<i class="form-icon"></i>Watched' +
             '</label>' +
             '</div>' +
             '<div class="content"><p>' + descr + '</p></div>';
     }
-    addCollapse();
-    renderWatched();
 }
 
 function addTalk (e) {
@@ -131,35 +138,34 @@ function addTalk (e) {
     yours.push(talk);
     localStorage.setItem('yourTalks', JSON.stringify(yours));
     renderTalks(yours, document.getElementById('yours'), false);
+    renderWatched(getWatched());
 }
 
 function removeTalk (e) {
     var yours = getYours();
     var url = e.previousElementSibling.href;
-    console.log(url);
     for (var i = 0; i < yours.length; i++) {
         if (url == yours[i].url) {
             yours.splice(i,1);
             console.log("sliced");
         }
     }
-    console.log(yours);
     localStorage.setItem('yourTalks', JSON.stringify(yours));
     renderTalks(yours, document.getElementById('yours'), false);
+    renderWatched(getWatched());
 }
 
 function watchedTalk (e) {
     var watched = getWatched();
     var url = e.parentNode.previousElementSibling.previousElementSibling.href;
-    if (!e.previousElementSibling.checked) { // now watched
+    if (e.checked) { // now watched
         watched.push(url);
-        localStorage.setItem('watchedTalks', JSON.stringify(watched));
     } else {
         for (var i = 0; i < watched.length; i++) {
             if (url == watched[i]) {
                 watched.splice(i,1);
             }
         }
-        localStorage.setItem('watchedTalks', JSON.stringify(watched));
     }
+    setWatched(watched);
 }
