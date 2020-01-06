@@ -84,7 +84,7 @@ function setBadge (id, num) {
     }
 }
 
-function fetchTalks () {
+async function fetchTalks () {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -95,8 +95,9 @@ function fetchTalks () {
     xmlhttp.send();
 
     var yourTalks = document.getElementById('yours');
-    renderTalks(getYours(), yourTalks, false);
-    setBadge('your', yourTalks.length);
+    let yours = getYours();
+    let prom = await renderTalks(yours, yourTalks, false);
+    setBadge('your', yours.length);
 }
 
 function displayTalks (json) {
