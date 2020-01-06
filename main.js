@@ -32,7 +32,6 @@ function addCollapse() {
 }
 
 function renderWatched (watched) {
-    console.log(watched);
     var coll = document.getElementsByTagName('input');
     for (var i = 0; i < coll.length; i++) {
         coll[i].checked = false;
@@ -42,8 +41,6 @@ function renderWatched (watched) {
         var url = coll[i].parentNode.previousElementSibling.previousElementSibling.href;
         for (var j = 0; j < watched.length; j++) {
             if (watched[j] == url) {
-                console.log(coll[i]);
-                console.log(url);
                 coll[i].checked = true;
             }
         }
@@ -78,6 +75,15 @@ function setWatched (watched) {
     renderWatched(watched);
 }
 
+function setBadge (id, num) {
+    var e = document.getElementById(id).firstElementChild;
+    if (num == undefined) {
+        e.setAttribute("data-badge", 0);
+    } else {
+        e.setAttribute("data-badge", num);
+    }
+}
+
 function fetchTalks () {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
@@ -90,6 +96,7 @@ function fetchTalks () {
 
     var yourTalks = document.getElementById('yours');
     renderTalks(getYours(), yourTalks, false);
+    setBadge('your', yourTalks.length);
 }
 
 function displayTalks (json) {
@@ -98,6 +105,7 @@ function displayTalks (json) {
     renderTalks(talks, talkList, true);
     addCollapse();
     renderWatched(getWatched());
+    setBadge('all', talks.length);
 }
 
 function renderTalks (talks, node, state) {
@@ -139,6 +147,7 @@ function addTalk (e) {
     localStorage.setItem('yourTalks', JSON.stringify(yours));
     renderTalks(yours, document.getElementById('yours'), false);
     renderWatched(getWatched());
+    setBadge('your', yours.length);
 }
 
 function removeTalk (e) {
@@ -147,12 +156,12 @@ function removeTalk (e) {
     for (var i = 0; i < yours.length; i++) {
         if (url == yours[i].url) {
             yours.splice(i,1);
-            console.log("sliced");
         }
     }
     localStorage.setItem('yourTalks', JSON.stringify(yours));
     renderTalks(yours, document.getElementById('yours'), false);
     renderWatched(getWatched());
+    setBadge('your', yours.length);
 }
 
 function watchedTalk (e) {

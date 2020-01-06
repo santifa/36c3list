@@ -33,7 +33,11 @@ for my $talk (@talks) {
     $parser->parse($resp->decoded_content);
     my @description = $parser->findvalues('//p');
     splice @description, 0, 2;
+    @description = map {(my $x = $_) =~ s/\\*//g; $x} @description;
+    @description = map {(my $x = $_) =~ s/\%//g; $x} @description;
+    @description = map {(my $x = $_) =~ s/\+//g; $x} @description;
     @description = map {(my $x = $_) =~ s/\"/\\"/g; $x} @description;
+    $talk_name =~ s/\"/\\"/g;
     #splice @description, -2, 2;
     my $description = join ' ', @description;
     my $object = '{"name":"' . $talk_name . '", "description":"' . $description . '",' .
